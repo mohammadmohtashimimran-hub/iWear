@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+backend/.env
+venv/
+.venv/
+node_modules/
+dist/
+postgres_data
+
+# Local SQLite dev DB (run `flask seed` after clone)
+backend/instance/*.db

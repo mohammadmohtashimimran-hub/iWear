@@ -1,0 +1,17 @@
+flowchart TD
+    A([Customer browses store]) --> B[Add product variant + addons to cart]
+    B --> C{Logged in?}
+    C -- No --> D[Guest checkout: enter name, phone, address]
+    C -- Yes --> E[Use saved profile + addresses]
+    D --> F[Review order summary]
+    E --> F
+    F --> G[POST /api/sales/orders<br/>cart_id, customer_id, payment=COD]
+    G --> H[Backend: validate cart items + stock]
+    H --> I{Stock OK?}
+    I -- No --> X[[Return 400 with insufficient stock]]
+    I -- Yes --> J[Create Order + OrderItems<br/>order_number = ORD-XXXX]
+    J --> K[Decrement variant quantities]
+    K --> L[Post sale voucher via finance_service.post_cod_sale<br/>Debit Accounts Receivable, Credit Sales Revenue]
+    L --> M[Mark Cart as 'converted']
+    M --> N[Return 201 Created with order_number]
+    N --> O([Redirect to /order-confirmation/:id])

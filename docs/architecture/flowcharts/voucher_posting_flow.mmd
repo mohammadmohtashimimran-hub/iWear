@@ -1,0 +1,10 @@
+flowchart TD
+    A([Sales / Purchase / Expense event]) --> B[Build VoucherEntry list:<br/>account_id, debit, credit]
+    B --> C[create_voucher voucher_type, entries, ref]
+    C --> D{Sum debit == Sum credit ?}
+    D -- No --> E[[Raise ValueError: unbalanced]]
+    D -- Yes --> F[Persist Voucher + entries]
+    F --> G[Generate voucher_number: VCH-XXXX]
+    G --> H[Commit transaction]
+    H --> I[Return Voucher object]
+    I --> J([Reflected in Trial Balance + P&L reports])

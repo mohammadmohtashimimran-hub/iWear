@@ -1,0 +1,15 @@
+flowchart TD
+    A([User types natural-language query<br/>e.g. 'show me sales today']) --> B[POST /api/ai-assistant/query]
+    B --> C[normalize lowercase + collapse whitespace]
+    C --> D[Iterate ReportingIntent list]
+    D --> E{Match keyword in normalized text?}
+    E -- Score wins --> F[Best matching ReportingIntent]
+    E -- No --> G[Return: 'No matching report found']
+    F --> H[Fetch active PredefinedQuery for intent]
+    H --> I[Substitute safe params today, year, month]
+    I --> J{Starts with SELECT?}
+    J -- No --> K[[Reject - read-only constraint]]
+    J -- Yes --> L[db.session.execute SQL]
+    L --> M[Format rows -&gt; summary + table]
+    M --> N[Log AssistantQueryLog: user, query, intent, status]
+    N --> O([Return JSON: intent, summary, table, status])

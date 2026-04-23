@@ -1,0 +1,225 @@
+```mermaid
+erDiagram
+    %% ──── Security & RBAC ────
+    users ||--o{ user_roles : "has"
+    roles ||--o{ user_roles : "assigned to"
+    roles ||--o{ role_permissions : "grants"
+    permissions ||--o{ role_permissions : "granted via"
+    users ||--o{ sessions : "sessions"
+    users ||--o{ audit_logs : "audit"
+
+    %% ──── Catalog & Inventory ────
+    product_categories ||--o{ products : "category"
+    product_brands ||--o{ products : "brand"
+    product_types ||--o{ products : "type"
+    products ||--o{ product_variants : "variants"
+    products ||--o{ product_images : "images"
+    products ||--o{ stock : "legacy stock"
+    product_variants ||--o{ stock_movements : "movements"
+    product_variants ||--o{ stock_adjustments : "adjustments"
+    product_variants ||--o{ inventory_valuations : "valuations"
+    warehouses ||--o{ stock_movements : "warehouse"
+
+    %% ──── Addons ────
+    product_categories ||--o{ addons : "addon groups"
+    addons ||--o{ addon_options : "options"
+
+    %% ──── Suppliers & Purchasing ────
+    suppliers ||--o{ purchase_orders : "supplies"
+    purchase_orders ||--o{ purchase_order_items : "items"
+    product_variants ||--o{ purchase_order_items : "variant"
+
+    %% ──── Customers ────
+    customers ||--o{ customer_addresses : "addresses"
+    customers ||--o{ orders : "places"
+    customers ||--o{ prescription_records : "prescriptions"
+    prescription_records ||--o{ prescription_details : "eye details"
+
+    %% ──── Carts ────
+    carts ||--o{ cart_items : "items"
+    product_variants ||--o{ cart_items : "variant"
+    cart_items ||--o{ cart_item_addons : "addons"
+    addon_options ||--o{ cart_item_addons : "option"
+
+    %% ──── Orders ────
+    order_statuses ||--o{ orders : "status"
+    orders ||--o{ order_items : "items"
+    product_variants ||--o{ order_items : "variant"
+    orders ||--o{ payments : "payments"
+    payment_types ||--o{ payments : "type"
+    orders ||--o{ returns : "returns"
+    returns ||--o{ return_items : "items"
+
+    %% ──── Finance ────
+    voucher_types ||--o{ vouchers : "type"
+    vouchers ||--o{ voucher_entries : "entries"
+    chart_of_accounts ||--o{ voucher_entries : "account"
+
+    %% ──── AI Reporting ────
+    reporting_intents ||--o{ intent_keywords : "keywords"
+    reporting_intents ||--o{ predefined_queries : "queries"
+    users ||--o{ assistant_query_logs : "AI queries"
+    reporting_intents ||--o{ assistant_query_logs : "matched intent"
+
+    %% ──── Settings ────
+    countries ||--o{ cities : "cities"
+
+    %% ──── Key Entities ────
+    users {
+        int id PK
+        string email UK
+        string password_hash
+        datetime created_at
+    }
+    products {
+        int id PK
+        string name
+        string slug UK
+        text description
+        decimal price
+        int quantity
+        int category_id FK
+        int brand_id FK
+        int type_id FK
+        bool active
+    }
+    product_variants {
+        int id PK
+        int product_id FK
+        string sku UK
+        string color
+        string size
+        decimal unit_price
+        int low_stock_threshold
+        bool active
+    }
+    product_images {
+        int id PK
+        int product_id FK
+        string image_url
+        bool is_primary
+    }
+    addons {
+        int id PK
+        string name
+        text description
+        int category_id FK
+        bool is_required
+        bool requires_image
+        bool active
+    }
+    addon_options {
+        int id PK
+        int addon_id FK
+        string name
+        text description
+        decimal price
+        bool active
+    }
+    customers {
+        int id PK
+        string first_name
+        string last_name
+        string phone
+        string email
+    }
+    carts {
+        int id PK
+        int customer_id FK
+        int user_id FK
+        string status
+    }
+    cart_items {
+        int id PK
+        int cart_id FK
+        int product_variant_id FK
+        int quantity
+        decimal unit_price
+    }
+    cart_item_addons {
+        int id PK
+        int cart_item_id FK
+        int addon_option_id FK
+        string image_url
+    }
+    orders {
+        int id PK
+        int customer_id FK
+        int user_id FK
+        int status_id FK
+        string order_number UK
+        decimal subtotal
+        decimal discount_total
+        decimal tax_total
+        decimal grand_total
+        text shipping_address
+    }
+    order_items {
+        int id PK
+        int order_id FK
+        int product_variant_id FK
+        int quantity
+        decimal unit_price
+        decimal line_total
+    }
+    prescription_records {
+        int id PK
+        int customer_id FK
+        datetime prescribed_date
+    }
+    prescription_details {
+        int id PK
+        int prescription_record_id FK
+        string eye
+        decimal sphere
+        decimal cylinder
+        int axis
+        decimal add_power
+        decimal pd
+    }
+    vouchers {
+        int id PK
+        int voucher_type_id FK
+        string voucher_number UK
+        date voucher_date
+        string reference_type
+        int reference_id
+    }
+    voucher_entries {
+        int id PK
+        int voucher_id FK
+        int account_id FK
+        decimal debit
+        decimal credit
+    }
+    chart_of_accounts {
+        int id PK
+        string code UK
+        string name
+        string account_type
+    }
+    reporting_intents {
+        int id PK
+        string code UK
+        string name
+    }
+    predefined_queries {
+        int id PK
+        int reporting_intent_id FK
+        string query_name
+        text sql_template
+        bool active
+    }
+    assistant_query_logs {
+        int id PK
+        int user_id FK
+        text raw_query
+        int interpreted_intent_id FK
+        string response_status
+    }
+    store_settings {
+        int id PK
+        string store_name
+        string currency
+    }
+```

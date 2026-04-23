@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant U as User
+    participant FE as React SPA
+    participant API as Flask Blueprint
+    participant DEC as require_permission
+    participant DB as PostgreSQL
+    U->>FE: Click "Manage products"
+    FE->>API: GET /api/inventory/products<br/>Authorization: Bearer JWT
+    API->>DEC: @jwt_required + @require_permission("inventory:read")
+    DEC->>DB: SELECT user.roles -> permissions
+    DB-->>DEC: ["inventory:read", ...]
+    alt Permission granted
+      DEC-->>API: continue
+      API->>DB: SELECT * FROM products
+      DB-->>API: rows
+      API-->>FE: 200 JSON
+      FE-->>U: Render list
+    else Denied
+      DEC-->>FE: 403 Forbidden
+      FE-->>U: Show error toast
+    end

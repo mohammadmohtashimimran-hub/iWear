@@ -1,0 +1,25 @@
+# Dependencies and env
+venv/
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Git and IDE
+.git/
+.gitignore
+.cursor/
+.vscode/
+*.md
+!README.md
+
+# Build and cache
+frontend/dist/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Don't need backend run.py root HTML (we serve SPA in Docker)
+# (keeping backend as-is)
